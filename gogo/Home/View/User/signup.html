@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>注册</title>
+<script src="<@@$smarty.const.JS_URL@@>jquery.min.js"></script>
+<script type="text/javascript">
+//验证用户名
+function chk_name(){
+	var user_name = $("#user_name").val();
+	if(!user_name){			
+		return false;
+	}
+	$.ajax({
+		type: "GET",
+	   	url: "?c=user&a=chknameAPI&user_name="+user_name,
+	   	dataType:"json",
+	   	success: function(msg){
+	    	if(msg.status =='OK'){
+	    		$("#user_info").html("<span style='color:green' >该用户名可以注册</sapn>")
+	    	}else{
+	    		$("#user_info").html("<span style='color:green' >该用户名已被注册</sapn>")
+	    		return false;
+	    	}
+	   	}
+	});
+}
+//验证邮箱合法性
+function chk_email(){
+	var user_email = $("input[name=user_email]").val();
+   	var re = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/
+	if(re.test(user_email)){
+	    $("#email_info").html("<span style='color:green' >邮箱输入正确</sapn>");
+	}else{
+	    $("#email_info").html("<span style='color:red'>邮箱输入有误</sapn>");
+	    return false;
+	}
+}
+//验证密码合法性
+function chk_pswd(){
+	var pawd  = $("input[name=user_pswd]").val()
+	var pawd2 = $("input[name=pswd_again]").val()
+	if(pawd2 =='' || pawd == ''){
+		return false;
+	} 
+    if(pawd2 !== pawd){
+		$("#password_info").html("<span style='color:red' >两次输入的密码不一致</sapn>");
+		return false;
+	}
+}
+	$(function(){
+		//用户失去焦点后ajax进行验证
+		$("#user_name").blur(function (){
+			chk_name();
+		})
+		//邮箱失去焦点后验证邮箱
+		$("input[name=pswd_again]").blur(function(){
+			chk_email();
+		})
+		$("input[name=user_pswd]").blur(function(){
+			chk_pswd();
+		})
+		//点击提交后的验证
+		$("#sub").click(function(){
+			if(chk_email()== false || chk_name() ==false || chk_pswd() == false){
+				console.log('aaaaaaaaaa');
+				return false;
+			}
+			var data_str = "user_name="+user_name+"&user_email="+user_email+"&user_pswd="+pawd;
+			$.ajax({
+				type: "POST",
+			   	url: "?c=user&a=signup",
+			   	data:data_str,
+			   	// dataType:"json",
+			   	success: function(msg){
+			    	if(msg.status =='OK'){
+			    		$("#user_info").html("<span style='color:green' >该用户名可以注册</sapn>")
+			    	}else{
+			    		$("#user_info").html("<span style='color:green' >该用户名已被注册</sapn>")
+			    	}
+			   	}
+			});
+
+
+		});
+	})
+</script>
+</head>
+<body onload="javascript:document.getElementById('user_name').focus();">
+<!-- <h2>欢迎注册gogo</h2> -->
+<form name="login" id="login" action="" method="post">
+邮箱：<input name="user_email" type="text" maxlength="20" tabindex="1"/><span id="email_info"></span>
+<br />
+用户名：<input name="user_name" type="text" maxlength="20" tabindex="2" id="user_name"/><span id="user_info"></span>
+<br />
+请你输入密码：  <input name="user_pswd" type="password" maxlength="20" tabindex="3"/><span id ="password_info" ></span>
+<br />
+再次输入密码：  <input name="pswd_again" type="password" maxlength="20" tabindex="4"/>
+<br />
+<input class="btn" type="submit" value="注册"  tabindex="4" id ="sub" />
+</form>
+</body>
+</html>
